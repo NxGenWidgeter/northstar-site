@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northstar — weather, your machine and your day, in one quiet panel</title>
+<meta name="description" content="Northstar is a 400 px panel in the corner of your screen: the weather and the next thing you have to be at, live device health, local and world headlines, and every calendar in one list. Runs entirely on your machine.">
+<meta name="theme-color" content="#06070A">
+<meta property="og:title" content="Northstar — weather, your machine and your day, in one panel">
+<meta property="og:description" content="The forecast at a glance, device health, headlines and today's events in one narrow panel. It runs on your machine, asks for nothing, and there is nothing to subscribe to.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nxgenwidgeter.github.io/northstar-site/">
+<meta property="og:site_name" content="Northstar">
+<meta property="og:image" content="https://nxgenwidgeter.github.io/northstar-site/assets/share.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Northstar panel beside the words Everything at a glance. One narrow panel.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nxgenwidgeter.github.io/northstar-site/assets/share.jpg">
+<link rel="canonical" href="https://nxgenwidgeter.github.io/northstar-site/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%2306070A'/%3E%3Cg fill='none' stroke='%237FB2FF'%3E%3Cpath d='M5.2 18.6 L15.8 8.2' stroke-width='1.6' opacity='.55'/%3E%3Ccircle cx='5.2' cy='18.6' r='2' fill='%237FB2FF' stroke='none'/%3E%3Ccircle cx='15.8' cy='8.2' r='4.2' stroke-width='2.2'/%3E%3Ccircle cx='15.8' cy='8.2' r='1.5' fill='%237FB2FF' stroke='none'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   TOKENS — the site follows the panel: near-black, one blue, one gold
+   ============================================================ */
+:root{
+  --bg:#06070A;
+  --bg-2:#0A0C11;
+  --surface:#0E1116;
+  --surface-2:#12161C;
+  --shot:#0B0D12;
+
+  --line:#1E232D;
+  --line-strong:#2A313D;
+
+  --ink:#F2F5FA;
+  --dim:#98A3B4;
+  --dimmer:#6B7484;
+
+  --accent:#7FB2FF;
+  --accent-ink:#06101F;
+  --gold:#E7B25A;
+
+  --accent-tint:rgba(127,178,255,.10);
+  --gold-tint:rgba(231,178,90,.10);
+
+  --shadow:0 26px 60px rgba(0,0,0,.55);
+  --radius:14px;
+  --radius-lg:18px;
+  --wrap:1180px;
+  --gutter:clamp(20px,4vw,40px);
+
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F7F3EC;
+  --bg-2:#F1EADF;
+  --surface:#FFFDFA;
+  --surface-2:#F4EEE4;
+
+  --line:#E3D8C8;
+  --line-strong:#D0C2AC;
+
+  --ink:#231B13;
+  --dim:#5E5040;
+  --dimmer:#8A7A66;
+
+  --accent:#2F6FD0;
+  --accent-ink:#FFFFFF;
+  --gold:#96610E;
+
+  --accent-tint:rgba(47,111,208,.09);
+  --gold-tint:rgba(150,97,14,.10);
+
+  --shadow:0 22px 50px rgba(70,48,20,.16);
+
+  color-scheme:light;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:400 17px/1.62 Cantarell,"Noto Sans",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  transition:background .3s ease,color .3s ease;
+}
+img,svg{display:block;max-width:100%}
+img{height:auto}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.028em;line-height:1.04;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+ul{margin:0;padding:0;list-style:none}
+::selection{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gutter)}
+.mono{font-family:"DejaVu Sans Mono",ui-monospace,monospace;letter-spacing:.03em}
+
+.kick{
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;
+  font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--accent);
+}
+.kick.gold{color:var(--gold)}
+
+h1{font-size:clamp(2.4rem,5.6vw,4.6rem)}
+h2{font-size:clamp(1.9rem,3.9vw,3.1rem)}
+h3{font-size:1.18rem;letter-spacing:-.012em;line-height:1.28}
+.lead{font-size:clamp(1.02rem,1.35vw,1.18rem);line-height:1.6;color:var(--dim);max-width:52ch}
+.copy p{color:var(--dim);max-width:54ch}
+.soft{color:var(--dimmer)}
+
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:200;
+  background:var(--accent);color:var(--accent-ink);
+  padding:12px 18px;border-radius:0 0 12px 0;font-weight:600;
+}
+.skip:focus{left:0;top:0}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  min-height:46px;padding:0 20px;border:1px solid transparent;border-radius:9px;
+  font:600 14.5px/1 Cantarell,"Noto Sans",sans-serif;
+  cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease;
+}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{transform:translateY(-1px);filter:brightness(1.07)}
+.btn-ghost{border-color:var(--line-strong);color:var(--ink)}
+.btn-ghost:hover{background:var(--surface);border-color:var(--dim)}
+.btn .arrow{transition:transform .18s ease}
+.btn:hover .arrow{transform:translateX(3px)}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg);border-bottom:1px solid var(--line);
+}
+.nav-inner{display:flex;align-items:center;gap:34px;height:66px}
+.brand{display:inline-flex;align-items:center;gap:9px;font-size:16.5px;letter-spacing:-.01em;white-space:nowrap}
+.brand svg{width:23px;height:23px;color:var(--accent);flex:none}
+.nav-links{display:flex;align-items:center;gap:26px;margin-left:auto}
+.nav-links a{font-size:14.5px;color:var(--dim);padding:6px 0;border-bottom:1px solid transparent;transition:color .18s,border-color .18s}
+.nav-links a:hover{color:var(--ink);border-color:var(--accent)}
+.nav-cta{display:flex;align-items:center;gap:10px}
+.nav .btn{min-height:38px;padding:0 15px;font-size:13.5px}
+.theme-btn{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  background:transparent;color:var(--dim);display:grid;place-items:center;cursor:pointer;
+  transition:color .18s,border-color .18s,background .18s;flex:none;
+}
+.theme-btn:hover{color:var(--ink);border-color:var(--line-strong);background:var(--surface)}
+.theme-btn svg{width:16px;height:16px}
+.menu-cta{display:none}
+.nav-toggle{
+  display:none;width:38px;height:38px;border-radius:10px;cursor:pointer;
+  background:transparent;border:1px solid var(--line);color:var(--ink);
+  align-items:center;justify-content:center;
+}
+.nav-toggle span{display:block;width:17px;height:1.6px;background:currentColor;position:relative}
+.nav-toggle span::before,.nav-toggle span::after{content:"";position:absolute;left:0;width:17px;height:1.6px;background:currentColor;transition:transform .2s,top .2s}
+.nav-toggle span::before{top:-5.5px}
+.nav-toggle span::after{top:5.5px}
+body.nav-open .nav-toggle span{background:transparent}
+body.nav-open .nav-toggle span::before{top:0;transform:rotate(45deg)}
+body.nav-open .nav-toggle span::after{top:0;transform:rotate(-45deg)}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(56% 62% at 75% 42%,var(--accent-tint) 0%,transparent 70%);
+}
+.hero-grid{
+  position:relative;display:grid;grid-template-columns:1.02fr .98fr;
+  gap:clamp(28px,4vw,60px);align-items:center;
+  padding-block:clamp(48px,6vw,84px) clamp(40px,5vw,64px);
+}
+.hero-copy h1{margin:18px 0 20px;font-size:clamp(2.05rem,3.55vw,3.3rem)}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:34px;
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;
+  font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);
+}
+.hero-meta span{display:inline-flex;align-items:center;gap:8px}
+.hero-meta span::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none}
+
+.hero-shot{position:relative;display:flex;justify-content:flex-end}
+.hero-shot .panel{
+  width:auto;max-width:400px;
+  max-height:calc(100vh - 210px);
+  filter:drop-shadow(0 30px 64px rgba(0,0,0,.55)) drop-shadow(0 4px 14px rgba(0,0,0,.4));
+}
+:root[data-theme="light"] .hero-shot .panel{
+  filter:drop-shadow(0 26px 48px rgba(64,44,18,.22));
+}
+.shot-dark{display:block}
+.shot-light{display:none}
+:root[data-theme="light"] .shot-dark{display:none}
+:root[data-theme="light"] .shot-light{display:block}
+
+/* ============================================================
+   BANDS
+   ============================================================ */
+.band{padding-block:clamp(60px,7vw,104px);border-bottom:1px solid var(--line)}
+.band.alt{background:var(--bg-2)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4.5vw,72px);align-items:center}
+.split.rev .copy{order:2}
+.copy .kick{margin-bottom:16px}
+.copy h2{margin-bottom:16px}
+.copy p + p{margin-top:14px}
+
+.specs{margin-top:26px;display:grid;gap:9px}
+.specs div{display:flex;gap:14px;align-items:baseline;font-size:13.5px;color:var(--dimmer)}
+.specs b{
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;font-size:10.5px;font-weight:400;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dim);min-width:86px;flex:none;
+}
+
+/* screenshot frame: the app is dark, so the frame is dark even on the light site */
+.shot{
+  position:relative;background:var(--shot);border:1px solid var(--line-strong);
+  border-radius:var(--radius-lg);padding:clamp(14px,2vw,26px) clamp(14px,2vw,26px) 0;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.shot img{margin:0 auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.45))}
+.shot::after{
+  content:attr(data-cap);display:block;margin:0 calc(-1 * clamp(14px,2vw,26px));
+  padding:11px 16px 12px;
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#7C8798;
+  border-top:1px solid rgba(255,255,255,.05);text-align:center;
+}
+
+/* ============================================================
+   PREVIEW PILL — the Book it card is a collab preview, not a product
+   ============================================================ */
+.pill{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;
+  padding:5px 11px;border-radius:999px;border:1px solid var(--line-strong);
+  background:var(--accent-tint);color:var(--accent);
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+}
+
+/* ============================================================
+   THEME PAIR
+   ============================================================ */
+.themes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2.2vw,26px);margin-top:40px}
+.themes figure{
+  margin:0;border-radius:var(--radius-lg);border:1px solid var(--line);
+  padding:clamp(14px,2vw,24px);display:grid;gap:14px;justify-items:center;
+}
+.themes figure.on-dark{background:#0B0D12;border-color:#242B36}
+.themes figure.on-light{background:#EFE8DC;border-color:#DCD2C2}
+.themes figcaption{
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:#7C8798;
+}
+.themes figure.on-light figcaption{color:#7A6350}
+.themes figure img{width:100%;max-width:280px}
+
+/* ============================================================
+   PRIVACY
+   ============================================================ */
+.privacy{padding-block:clamp(70px,9vw,124px);border-bottom:1px solid var(--line)}
+.privacy h2{font-size:clamp(2.1rem,5.2vw,4.2rem);max-width:16ch;margin-top:18px}
+.privacy .rest{font-size:clamp(1.25rem,2.3vw,1.85rem);color:var(--dim);margin-top:16px}
+.privacy .mono{
+  margin-top:34px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
+}
+
+/* ============================================================
+   STEPS
+   ============================================================ */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,2vw,20px)}
+.step{border-top:1px solid var(--line-strong);padding-top:18px}
+.step .n{
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;font-size:11px;
+  letter-spacing:.16em;color:var(--accent);
+}
+.step h3{margin-top:12px;font-size:1.06rem}
+.step p{margin-top:8px;font-size:14.5px;color:var(--dim)}
+
+/* ============================================================
+   PRICE
+   ============================================================ */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,18px);margin-top:44px}
+.plan{
+  position:relative;display:flex;flex-direction:column;
+  border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);
+  padding:26px 24px;
+}
+.plan.feature{border-color:rgba(231,178,90,.5);background:linear-gradient(180deg,rgba(231,178,90,.13),rgba(231,178,90,.05))}
+:root[data-theme="light"] .plan.feature{border-color:rgba(150,97,14,.45);background:linear-gradient(180deg,rgba(150,97,14,.10),rgba(150,97,14,.04))}
+.plan .name{
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);
+}
+.plan.feature .name{color:var(--gold)}
+.plan .price{font-size:2.35rem;font-weight:600;letter-spacing:-.03em;margin:14px 0 4px;line-height:1}
+.plan .price small{font-size:.875rem;font-weight:400;letter-spacing:0;color:var(--dim)}
+.plan ul{display:grid;gap:9px;margin:20px 0 22px;font-size:15px;color:var(--dim)}
+.plan li{display:flex;gap:10px;align-items:flex-start;line-height:1.45}
+.plan li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:9px;flex:none}
+.plan.feature li::before{background:var(--gold)}
+.plan .fine{
+  margin-top:auto;padding-top:14px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--dimmer);
+}
+.plan .tag{
+  position:absolute;top:18px;right:18px;
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--gold);
+  border:1px solid rgba(231,178,90,.42);border-radius:999px;padding:4px 8px;
+}
+:root[data-theme="light"] .plan .tag{border-color:rgba(150,97,14,.42)}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq{margin-top:40px;border-top:1px solid var(--line);max-width:860px}
+details{border-bottom:1px solid var(--line)}
+summary{
+  display:flex;align-items:center;gap:18px;padding:20px 0;cursor:pointer;list-style:none;
+  font-size:1.06rem;font-weight:600;letter-spacing:-.008em;
+}
+summary::-webkit-details-marker{display:none}
+summary .plus-i{margin-left:auto;width:13px;height:13px;position:relative;flex:none}
+summary .plus-i::before,summary .plus-i::after{content:"";position:absolute;background:var(--dim);transition:transform .2s,background .2s}
+summary .plus-i::before{left:0;top:5.7px;width:13px;height:1.6px}
+summary .plus-i::after{left:5.7px;top:0;width:1.6px;height:13px}
+details[open] summary{color:var(--accent)}
+details[open] summary .plus-i::after{transform:scaleY(0)}
+details[open] summary .plus-i::before,details[open] summary .plus-i::after{background:var(--accent)}
+details p{padding:0 0 22px;max-width:72ch;color:var(--dim);font-size:16px}
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.contact-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:clamp(28px,4vw,64px);align-items:start}
+.contact-list{margin-top:30px;display:grid}
+.contact-list .row{display:grid;grid-template-columns:88px 1fr;gap:16px;align-items:baseline;padding:13px 0;border-top:1px solid var(--line)}
+.contact-list .row:last-child{border-bottom:1px solid var(--line)}
+.contact-list .k{
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
+}
+.contact-list .v,.contact-list a{font-size:15px;color:var(--dim)}
+.contact-list a:hover{color:var(--accent)}
+
+.form-card{border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--surface);padding:clamp(20px,2.6vw,30px)}
+form{display:grid;gap:16px}
+.field{display:grid;gap:7px}
+.field label{
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
+}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--bg);border:1px solid var(--line);border-radius:9px;
+  color:var(--ink);font:inherit;font-size:15px;padding:11px 13px;min-height:44px;
+  transition:border-color .16s,background .16s;
+}
+.field textarea{min-height:104px;resize:vertical;line-height:1.5}
+.field input::placeholder,.field textarea::placeholder{color:var(--dimmer)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);background:var(--surface-2)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+select{
+  appearance:none;padding-right:40px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%2398A3B4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;background-size:11px 7px;
+}
+:root[data-theme="light"] select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%235E5040' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.consent{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;color:var(--dim);line-height:1.5}
+.consent input{width:17px;height:17px;min-height:0;margin-top:3px;accent-color:var(--accent);flex:none}
+.form-note{font-size:13px;color:var(--dimmer)}
+.form-note a{color:var(--accent);border-bottom:1px solid var(--line-strong)}
+.form-status{display:none;font-size:14.5px;border-radius:10px;padding:12px 14px;line-height:1.5}
+.form-status[data-state="ok"]{display:block;background:var(--accent-tint);border:1px solid var(--line-strong);color:var(--ink)}
+.form-status[data-state="error"]{display:block;background:rgba(232,115,107,.12);border:1px solid rgba(232,115,107,.4);color:var(--ink)}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:56px 30px}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:32px}
+.footer .brand{font-size:17px}
+.footer .tag{margin-top:14px;font-size:14.5px;color:var(--dim);max-width:34ch}
+.footer h4{
+  margin:0 0 14px;font-family:"DejaVu Sans Mono",ui-monospace,monospace;
+  font-size:10px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);
+}
+.footer ul{display:grid;gap:10px}
+.footer ul a{font-size:14.5px;color:var(--dim)}
+.footer ul a:hover{color:var(--accent)}
+.footer-base{
+  display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;
+  margin-top:46px;padding-top:20px;border-top:1px solid var(--line);
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
+}
+.footer-base a:hover{color:var(--accent)}
+
+/* ============================================================
+   HELP — feedback, then the people who gave it
+   ============================================================ */
+.support-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin-top:34px}
+.support-actions .mono{color:var(--dimmer)}
+/* the dormant tip jar — display:flex would beat [hidden], so be explicit */
+.tipline{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 26px;
+  margin-top:34px;padding:20px 22px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.tipline[hidden]{display:none}
+.tipline h3{margin:0 0 6px;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.tipline p{margin:0;color:var(--dim);font-size:14px;max-width:56ch}
+.tipline .btn{flex:0 0 auto}
+
+.board{margin-top:54px;padding-top:26px;border-top:1px solid var(--line)}
+.board-head{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between}
+.board-head h3{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}
+.board-head .mono{color:var(--dimmer)}
+.supporters{display:flex;flex-wrap:wrap;gap:10px;list-style:none;margin:20px 0 0;padding:0}
+.supporters li{
+  display:inline-flex;align-items:baseline;gap:8px;
+  border:1px solid var(--line);border-radius:999px;padding:7px 14px;
+  font-size:14px;color:var(--ink);background:var(--surface);
+}
+.supporters li .k{
+  font-family:"DejaVu Sans Mono",ui-monospace,monospace;
+  font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
+}
+.supporters li .n{color:var(--dim);font-size:13px}
+.supporters li.empty{border-style:dashed;color:var(--dimmer);background:transparent}
+.plans.single{grid-template-columns:1fr;max-width:560px}
+
+/* ============================================================
+   REVEAL + RESPONSIVE
+   ============================================================ */
+.js .rv{opacity:0;transform:translateY(14px)}
+.js .rv.is-in{animation:rvIn .6s ease both}
+@keyframes rvIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+@media (max-width:1000px){
+  .hero-grid,.split,.contact-grid{grid-template-columns:1fr}
+  .split.rev .copy{order:0}
+  .hero-shot{justify-content:center}
+  .hero-shot .panel{max-width:360px}
+  .steps{grid-template-columns:1fr 1fr}
+  .plans{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:860px){
+  .nav-links{
+    position:fixed;inset:66px 0 auto;display:none;flex-direction:column;align-items:stretch;gap:0;
+    background:var(--bg);border-bottom:1px solid var(--line);
+    padding:8px var(--gutter) 26px;height:calc(100dvh - 66px);overflow-y:auto;
+  }
+  .nav-links a{padding:15px 0;border-bottom:1px solid var(--line);font-size:16.5px}
+  .nav-links a.menu-cta{
+    display:flex;align-items:center;justify-content:center;margin-top:20px;padding:14px 18px;
+    border:0;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-weight:600;
+  }
+  body.nav-open{overflow:hidden}
+  body.nav-open .nav-links{display:flex}
+  .nav-toggle{display:inline-flex}
+  .nav-cta .btn{display:none}
+}
+@media (max-width:620px){
+  body{font-size:16.5px}
+  .field-row{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .themes{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:26px}
+  .specs div{flex-direction:column;gap:3px}
+  .specs b{min-width:0}
+  .contact-list .row{grid-template-columns:76px 1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important}
+  .js .rv{opacity:1;transform:none}
+}
+</style>
+<script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ============================ NAV ============================ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="Northstar, home">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <g fill="none" stroke="currentColor">
+          <path d="M4.6 19.4 L19.2 5.6" stroke-width="1.25" opacity=".5"/>
+          <circle cx="4.6" cy="19.4" r="1.7" fill="currentColor" stroke="none" opacity=".72"/>
+          <circle cx="12.4" cy="12.4" r="2" fill="currentColor" stroke="none" opacity=".92"/>
+          <circle cx="19.2" cy="5.6" r="3" stroke-width="1.5"/>
+          <circle cx="19.2" cy="5.6" r="1.1" fill="currentColor" stroke="none"/>
+        </g>
+      </svg>
+      Northstar
+    </a>
+
+    <nav class="nav-links" id="nav-links" aria-label="Main">
+      <a href="#features">What's inside</a>
+      <a href="#looks">The panel</a>
+      <a href="#pricing">Price</a>
+      <a href="#support">Help</a>
+      <a href="#faq">Questions</a>
+      <a class="menu-cta" href="#contact">Get the early build</a>
+    </nav>
+
+    <div class="nav-cta">
+      <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch theme" title="Switch between dark and light">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M12 3.6a8.4 8.4 0 0 1 0 16.8z" fill="currentColor"/>
+        </svg>
+      </button>
+      <a class="btn btn-primary" href="#contact">Get the early build</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============================ HERO ============================ -->
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="kick">Linux and Windows · local-first</p>
+        <h1>Everything you check every morning. <span class="soft">In one panel.</span></h1>
+        <p class="lead">A 400 px column in the corner of your screen: what the sky is doing, how long until you have to leave, is the machine alright, what happened, and what's on today. No account, no tab to babysit.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#contact">Get the early build <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="btn btn-ghost" href="#looks">See every card</a>
+        </div>
+        <p class="hero-meta">
+          <span>GTK + WebKit</span><span>stdlib service on loopback</span><span>Open-Meteo</span><span>counts off by default</span>
+        </p>
+      </div>
+
+      <div class="hero-shot">
+        <img class="panel shot-dark" src="assets/panel_dark.png" width="800" height="1598" fetchpriority="high"
+             alt="The Northstar panel: a weather strip, this device, headlines and events in one narrow column">
+        <img class="panel shot-light" src="assets/panel_light.png" width="800" height="1598" fetchpriority="high"
+             alt="The same panel in light mode">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 01 TODAY ============================ -->
+  <section class="band alt">
+    <div class="wrap split rev">
+      <div class="shot rv" data-cap="The strip, opened · 12-hour rain, sunset, PM2.5">
+        <img src="assets/strip_forecast.png" width="800" height="370" fetchpriority="high"
+             alt="The glance strip — greeting, 26 degrees with rain later, next event — opened to show hourly rain chances, today's high and low, sunset and PM2.5">
+      </div>
+      <div class="copy rv">
+        <p class="kick">01 — Before you read anything</p>
+        <h2>The sky,<br><span class="soft">and what's next.</span></h2>
+        <p>One row above the cards: a greeting, the temperature, whether rain is coming, and a countdown to the next thing you have to be at. Tap it and twelve hours of rain probability, today's range, sunset and PM2.5 drop over the cards.</p>
+        <p>Weather is Open-Meteo — no key, no account, no sign-up — and it is cached like the headlines, so a laptop that opens without wifi still knows what the sky was doing.</p>
+        <div class="specs">
+          <div><b>Source</b><span>Open-Meteo · one geocoded place, changeable</span></div>
+          <div><b>Haze</b><span>PM2.5, measured against the WHO guideline</span></div>
+          <div><b>Offline</b><span>last forecast kept on disk, marked cached</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 02 DEVICE ============================ -->
+  <section class="band" id="features">
+    <div class="wrap split">
+      <div class="copy rv">
+        <p class="kick">02 — This device</p>
+        <h2>This machine, live.</h2>
+        <p>CPU, memory, disk, battery, network throughput and temperature, sampled once a second straight from <span class="mono">/proc</span> and <span class="mono">/sys</span>.</p>
+        <p>Battery also says what it is doing: <span class="mono">charging · 22m to full</span>, or <span class="mono">3h 10m left</span>.</p>
+        <div class="specs">
+          <div><b>Source</b><span>/proc + /sys, read as your own user</span></div>
+          <div><b>Needs</b><span>a compositor — Cinnamon, GNOME, KDE</span></div>
+          <div><b>Root</b><span>never</span></div>
+        </div>
+      </div>
+      <div class="shot rv" data-cap="One-second sampling · live">
+        <img src="assets/card_health.png" width="800" height="386" loading="lazy"
+             alt="Device card showing CPU, memory, disk, battery with time remaining, network and temperature">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 03 HEADLINES ============================ -->
+  <section class="band alt">
+    <div class="wrap split rev">
+      <div class="shot rv" data-cap="World scope · three sources, merged">
+        <img src="assets/card_news_world.png" width="800" height="414" loading="lazy"
+             alt="Headlines card in world scope, with source labels and relative times">
+      </div>
+      <div class="copy rv">
+        <p class="kick">03 — Headlines</p>
+        <h2>Local. World.<br>One toggle.</h2>
+        <p>Two scopes behind a single switch, remembered between launches. Local pulls Free Malaysia Today, Malay Mail, Malaysiakini, Berita Harian and three more Malaysian outlets; World pulls BBC, Al Jazeera and Hacker News.</p>
+        <p>Merged newest-first with at most three items per source, so one feed can't flood the panel. The last good fetch is kept on disk for a week: a start with no network still has headlines, labelled cached, with the age.</p>
+        <div class="specs">
+          <div><b>Fetched</b><span>by the local service, cached ten minutes</span></div>
+          <div><b>Opens in</b><span>your browser — the panel stays put</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 04 EVENTS ============================ -->
+  <section class="band">
+    <div class="wrap split">
+      <div class="copy rv">
+        <p class="kick">04 — Events</p>
+        <h2>Every calendar,<br>one list.</h2>
+        <p>Type an event inline, or subscribe any <span class="mono">.ics</span> address from Google, Apple, Outlook or Proton. Read-only calendars keep a source chip instead of a delete button, and recurring rules are expanded sixty days out.</p>
+        <p>Ten minutes before something starts, a desktop notification — so the panel never has to be watched. One bell in the header turns it off.</p>
+        <div class="specs">
+          <div><b>Rules</b><span>DAILY · WEEKLY · MONTHLY · YEARLY, COUNT, UNTIL, BYDAY, EXDATE</span></div>
+          <div><b>Export</b><span>any calendar app, one <span class="mono">.ics</span></span></div>
+          <div><b>Reminders</b><span>ten minutes out, once per event, restart-safe</span></div>
+        </div>
+      </div>
+      <div class="shot rv" data-cap="Subscription open · Malaysia holidays, 312 events">
+        <img src="assets/card_events_cal.png" width="800" height="798" loading="lazy"
+             alt="Events card with a calendar subscription open above a list of upcoming holidays">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ BOOK IT ============================ -->
+  <section class="band">
+    <div class="wrap split rev">
+      <div class="shot rv" data-cap="Deep links · no accounts, no APIs">
+        <img src="assets/card_bookit.png" width="800" height="338" loading="lazy"
+             alt="Book it card with ride and reservation deep links, plus the Grab and foodpanda collab slots">
+      </div>
+      <div class="copy rv">
+        <span class="pill">Free · preview</span>
+        <h2>Book it.</h2>
+        <p>A ride, or a table for tonight — deep links straight into the app you already have. No accounts, no API keys, nothing gated, no upgrade.</p>
+        <p class="soft" style="font-size:14.5px">Ride · Uber · Lyft · reserve a table. The booking, the payment and the confirmation all happen in those apps.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ THEME ============================ -->
+  <section class="band alt" id="looks">
+    <div class="wrap">
+      <div class="copy rv" style="max-width:640px">
+        <p class="kick">05 — Theme</p>
+        <h2>Light, or dark.<br><span class="soft">It remembers.</span></h2>
+        <p>One tap in the header flips the whole panel — cards, ink, accent and the focus ring. The choice survives restarts, even when WebKit forgets everything else.</p>
+      </div>
+      <div class="themes">
+        <figure class="on-dark rv">
+          <figcaption>Dark</figcaption>
+          <img src="assets/panel_dark.png" width="800" height="1598" loading="lazy"
+               alt="Northstar panel in dark mode">
+        </figure>
+        <figure class="on-light rv">
+          <figcaption>Light</figcaption>
+          <img src="assets/panel_light.png" width="800" height="1598" loading="lazy"
+               alt="Northstar panel in light mode">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PRIVACY ============================ -->
+  <section class="privacy">
+    <div class="wrap">
+      <p class="kick rv">Local-first</p>
+      <h2 class="rv">Nothing leaves this machine.</h2>
+      <p class="rest rv">Except a few RSS fetches, one weather lookup — and a usage summary, only if you tick the box.</p>
+      <p class="mono rv">No account · one stdlib service on 127.0.0.1 · counts off by default</p>
+    </div>
+  </section>
+
+  <!-- ============================ HOW ============================ -->
+  <section class="band" id="how">
+    <div class="wrap">
+      <div class="copy rv" style="max-width:660px">
+        <p class="kick">How it works</p>
+        <h2>Install, connect, forget it.</h2>
+        <p>One local service, one thin window. No dashboard to learn, no sign-up between you and your own computer.</p>
+      </div>
+      <div class="steps" style="margin-top:44px">
+        <div class="step rv">
+          <span class="n">01</span>
+          <h3>Download</h3>
+          <p>One file, one command. It starts with your session and stays in the corner.</p>
+        </div>
+        <div class="step rv">
+          <span class="n">02</span>
+          <h3>Connect</h3>
+          <p>Paste a calendar link, set your place for the weather and your country for the news. That's the whole setup.</p>
+        </div>
+        <div class="step rv">
+          <span class="n">03</span>
+          <h3>Fold</h3>
+          <p>Tap a card to collapse the ones you never read. It remembers for next time.</p>
+        </div>
+        <div class="step rv">
+          <span class="n">04</span>
+          <h3>Pass it on</h3>
+          <p>Send it to someone who checks the same things, and tell me what's missing. That is the whole support model.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PRICE ============================ -->
+  <section class="band alt" id="pricing">
+    <div class="wrap">
+      <div class="copy rv" style="max-width:660px">
+        <p class="kick">Price</p>
+        <h2>It is free.<br><span class="soft">All of it, always.</span></h2>
+        <p>There is no subscription and no account. The bookings, the weather, the calendars, the Windows installer — the same panel for everyone, with no feature held back.</p>
+      </div>
+
+      <div class="plans single">
+        <div class="plan rv">
+          <span class="name">Northstar</span>
+          <span class="price">$0</span>
+          <ul>
+            <li>Weather, rain and haze</li>
+            <li>Device health, live, with battery time</li>
+            <li>Local and world headlines, offline too</li>
+            <li>Your events and calendars</li>
+            <li>Reminders ten minutes out</li>
+            <li>Booking links and the collab preview</li>
+            <li>Fold state, themes and .ics export</li>
+          </ul>
+          <p class="fine">No account, no card, no nagging — and nothing to upgrade to.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ HELP ============================ -->
+  <section class="band" id="support">
+    <div class="wrap">
+      <div class="copy rv" style="max-width:660px">
+        <p class="kick">Help</p>
+        <h2><span data-copy="dormant">No tip jar.<br><span class="soft">Time is the useful thing.</span></span><span data-copy="live" hidden>A tip, if it earned one.<br><span class="soft">So is a bug report.</span></span></h2>
+        <p data-copy="dormant">Northstar is a side project, not a company. There is nothing to buy and nothing to subscribe to, and what actually moves it is someone running the Windows build and telling me what breaks, or naming the one card that is missing.</p>
+        <p data-copy="live" hidden>Northstar is a side project, not a company. There is still nothing to buy and nothing to subscribe to — a one-off coffee covers the domain and the code-signing certificate that stops the Windows installer looking like malware. A bug report helps just as much, and costs nobody anything.</p>
+      </div>
+
+      <div class="support-actions rv">
+        <a class="btn btn-primary" href="mailto:nxautomation003@gmail.com?subject=Northstar%20feedback">Send a bug or an idea</a>
+        <span class="mono">two lines is enough · no account</span>
+      </div>
+
+      <!-- The tip jar. Dormant: the block stays `hidden` and the link unroutable until
+           tools/set-support-links.py is given a real handle. An unconfigured donation
+           button is worse than none — it looks like the project is asking and ignoring
+           you at the same time. -->
+      <div class="tipline rv" id="tipline" hidden>
+        <div>
+          <h3>Or buy a coffee</h3>
+          <p>One-off, nothing recurring, no account needed. Ko-fi charges 0% of a tip on
+             its free plan with Standard mode off; the only cut is what the payment
+             processor takes to move it.</p>
+        </div>
+        <a href="#" data-platform="ko-fi" class="btn btn-ghost" data-support rel="noopener">Buy me a coffee</a>
+      </div>
+
+      <div class="board rv">
+        <div class="board-head">
+          <h3>People who helped</h3>
+          <span class="mono">names appear only with permission</span>
+        </div>
+        <ul class="supporters" id="supporters">
+          <!-- One line per person, newest first, only if they said yes. kind is
+               free text (tester, bug report, idea, translation); note is short.
+
+               <li><span class="k">tester</span><span class="who">Nadia</span><span class="n">found the overflow bug</span></li>
+          -->
+          <li class="empty">Nobody yet. A bug report that lands gets the first line.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ FAQ ============================ -->
+  <section class="band alt" id="faq">
+    <div class="wrap">
+      <div class="copy rv" style="max-width:660px">
+        <p class="kick">Questions</p>
+        <h2>Before you install.</h2>
+        <p>If yours isn't here, ask it in the form below — it reaches the people writing the app.</p>
+      </div>
+
+      <div class="faq rv">
+        <details open>
+          <summary>What does Northstar send, and to whom? <span class="plus-i" aria-hidden="true"></span></summary>
+          <p>Feed requests and calendar fetches, made by the local service on your machine to the addresses you point it at — plus one weather lookup to Open-Meteo for the place you set. No analytics vendor, no account for the free tier. There is an optional usage summary, and it stays off until you tick a box on first launch; the exact payload is printed before you can agree. Clicking a headline hands the link to your browser and stops there.</p>
+        </details>
+        <details>
+          <summary>What is in the usage summary? <span class="plus-i" aria-hidden="true"></span></summary>
+          <p>Your OS, desktop and language, the app version, a random install id, how many days it has been opened, counts of eight named actions (folding a card, opening the forecast, switching the theme, adding an event, and so on) and counts of failed fetches by kind. Never headlines, event names, your city, calendar addresses, file paths or your machine's name — there is no field for them. The same panel in the app prints the live JSON and has a <em>Stop and delete</em> button.</p>
+        </details>
+        <details>
+          <summary>What happens with no internet? <span class="plus-i" aria-hidden="true"></span></summary>
+          <p>The panel still opens. Device health and your own events are local; headlines and the forecast come from the last good fetch, labelled <em>cached</em> with its age, and the cards say so instead of pretending to be current. Your calendars stay readable, they just stop updating.</p>
+        </details>
+        <details>
+          <summary>Which systems does it run on? <span class="plus-i" aria-hidden="true"></span></summary>
+          <p>Linux, as a GTK window over a local service, and Windows through a per-user installer that carries its own Python and WebView2. macOS has no build yet. The panel is a web view either way, so nothing in the design is tied to one desktop.</p>
+        </details>
+        <details>
+          <summary>Do I need an account? <span class="plus-i" aria-hidden="true"></span></summary>
+          <p>Nothing. There are no accounts at all — nothing to sign up for, nothing to cancel, and your calendars and events never leave your machine.</p>
+        </details>
+        <details>
+          <summary>How do the tables and rides actually work? <span class="plus-i" aria-hidden="true"></span></summary>
+          <p>Deep links. Northstar opens OpenTable, Uber, Lyft or whatever you have installed with the details filled in. There are no API keys and no partnerships, so the booking, the payment and the confirmation all happen in those apps.</p>
+        </details>
+        <details>
+          <summary>Why not just pin a browser tab? <span class="plus-i" aria-hidden="true"></span></summary>
+          <p>A tab wants space and attention. Northstar is a narrow strip on the edge of the screen, the glance strip and four cards at once, no scrolling, and it folds down to just what you watch. It also reads your machine, which a web page can't.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CONTACT ============================ -->
+  <section class="band contact" id="contact">
+    <div class="wrap contact-grid">
+      <div class="rv">
+        <p class="kick">Say hello</p>
+        <h2 style="margin-top:16px">Want the early build?</h2>
+        <p class="lead" style="margin-top:16px">It goes out in small batches, so nobody gets a broken panel. Tell us what you'd check first — that shapes the next one.</p>
+
+        <dl class="contact-list">
+          <div class="row"><dt class="k">Email</dt><dd><a href="mailto:nxautomation003@gmail.com">nxautomation003@gmail.com</a></dd></div>
+          <div class="row"><dt class="k">Builds</dt><dd class="v">Linux preview · Windows installer · macOS later</dd></div>
+          <div class="row"><dt class="k">Source</dt><dd class="v">Local service, standard library — readable</dd></div>
+          <div class="row"><dt class="k">Reply</dt><dd class="v">From a person, not a bot</dd></div>
+        </dl>
+      </div>
+
+      <!--
+        EDIT: this form is front-end only.
+        To receive submissions, set action to your form endpoint
+        (Formspree, Netlify Forms, Basin) and method="POST", then delete
+        the submit handler at the bottom of this file.
+      -->
+      <div class="form-card rv">
+        <form id="contact-form" action="#" method="post" novalidate>
+          <div class="field-row">
+            <div class="field">
+              <label for="name">Your name</label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="Alex Rivera" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="alex@mail.com" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="platform">What do you run?</label>
+            <select id="platform" name="platform">
+              <option value="">Pick one</option>
+              <option>Linux — Arch / CachyOS</option>
+              <option>Linux — Debian / Ubuntu</option>
+              <option>Linux — Fedora</option>
+              <option>macOS</option>
+              <option>Windows</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="message">What would you want it to show?</label>
+            <textarea id="message" name="message" placeholder="Battery and disk at a glance, my work calendar, and the local news. I'd pay for the ride home after a late shift." required></textarea>
+          </div>
+
+          <label class="consent">
+            <input type="checkbox" name="consent" required>
+            <span>Just the build and a note when something big changes. No newsletter.</span>
+          </label>
+
+          <button class="btn btn-primary" type="submit" style="width:100%">Send me the early build <span class="arrow" aria-hidden="true">→</span></button>
+          <p class="form-note">Or write to <a href="mailto:nxautomation003@gmail.com">nxautomation003@gmail.com</a>. Replies are slow but real.</p>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="#top" aria-label="Northstar, home">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <g fill="none" stroke="currentColor">
+           <path d="M4.6 19.4 L19.2 5.6" stroke-width="1.25" opacity=".5"/>
+           <circle cx="4.6" cy="19.4" r="1.7" fill="currentColor" stroke="none" opacity=".72"/>
+           <circle cx="12.4" cy="12.4" r="2" fill="currentColor" stroke="none" opacity=".92"/>
+           <circle cx="19.2" cy="5.6" r="3" stroke-width="1.5"/>
+           <circle cx="19.2" cy="5.6" r="1.1" fill="currentColor" stroke="none"/>
+         </g>
+          </svg>
+          Northstar
+        </a>
+        <p class="tag">Your day, at a glance. A quiet panel for the weather, your computer, your news and your day — made by people who kept opening the same five tabs.</p>
+      </div>
+      <div>
+        <h4>Panel</h4>
+        <ul>
+          <li><a href="#features">What's inside</a></li>
+          <li><a href="#looks">The panel</a></li>
+          <li><a href="#pricing">Price</a></li>
+          <li><a href="#support">Help</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Cards</h4>
+        <ul>
+          <li><a href="#features">Weather strip</a></li>
+          <li><a href="#features">This device</a></li>
+          <li><a href="#features">Headlines</a></li>
+          <li><a href="#features">Events</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:nxautomation003@gmail.com">nxautomation003@gmail.com</a></li>
+          <li><a href="#faq">Questions</a></li>
+          <li><a href="#contact">Early build</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-base">
+      <span>GTK + WebKit · runs on your machine</span>
+      <span>&copy; 2026 Northstar &nbsp;·&nbsp; <a href="#top">Back to top</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------- Theme: the same one-tap choice the panel has ---------- */
+(function(){
+  var root = document.documentElement, key = 'northstar.site.theme', saved = null;
+  try { saved = localStorage.getItem(key); } catch(e){}
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+  var btn = document.getElementById('theme-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(){
+    var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    btn.setAttribute('title', next === 'light' ? 'Switch to dark' : 'Switch to light');
+    try { localStorage.setItem(key, next); } catch(e){}
+  });
+})();
+
+/* ---------- Mobile nav ---------- */
+(function(){
+  var btn = document.querySelector('.nav-toggle');
+  if (!btn) return;
+  btn.addEventListener('click', function(){
+    var open = document.body.classList.toggle('nav-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  });
+  document.querySelectorAll('#nav-links a').forEach(function(a){
+    a.addEventListener('click', function(){
+      document.body.classList.remove('nav-open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();
+
+/* ---------- Scroll reveal ---------- */
+(function(){
+  var items = document.querySelectorAll('.rv');
+  if (!items.length) return;
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    items.forEach(function(el){ el.classList.add('is-in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting){ e.target.classList.add('is-in'); io.unobserve(e.target); }
+    });
+  }, {rootMargin:'0px 0px -8% 0px', threshold:0.08});
+  items.forEach(function(el){ io.observe(el); });
+})();
+
+/* ---------- Contact form: no backend, so it hands off to your mail app ----------
+   The form composes a mailto with the answers and opens it. Nothing is sent by the
+   page; the visitor presses send in their own client, from their own address, which
+   also means the reply goes straight back to them. */
+(function(){
+  var form = document.getElementById('contact-form');
+  var status = document.getElementById('form-status');
+  if (!form || !status) return;
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var ok = true;
+    form.querySelectorAll('[required]').forEach(function(el){
+      var valid = el.type === 'checkbox' ? el.checked : el.value.trim() !== '';
+      if (el.type === 'email' && valid) valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+      el.style.borderColor = valid ? '' : '#C04A3C';
+      if (!valid) ok = false;
+    });
+    if (!ok){
+      status.dataset.state = 'error';
+      status.textContent = 'Almost — the highlighted fields still need filling in.';
+      return;
+    }
+    var data = new FormData(form);
+    var body = [
+      'Name: ' + (data.get('name') || ''),
+      'Email: ' + (data.get('email') || ''),
+      'Runs: ' + (data.get('platform') || ''),
+      '',
+      String(data.get('message') || '')
+    ].join('\r\n');
+    var href = 'mailto:nxautomation003@gmail.com'
+      + '?subject=' + encodeURIComponent('Northstar — early build')
+      + '&body=' + encodeURIComponent(body);
+    status.dataset.state = 'ok';
+    status.dataset.mailto = href;          // so the hand-off can be checked without a mail client
+    status.textContent = 'Opening your mail app with these details. Nothing is sent until you press send there.';
+    window.location.href = href;
+    form.reset();
+    // a browser with no mail handler silently does nothing, so say the address
+    setTimeout(function(){
+      if (!status.dataset.fallback){
+        status.dataset.fallback = '1';
+        status.textContent = 'If no mail app opened, write to nxautomation003@gmail.com — the draft has the details.';
+      }
+    }, 1600);
+  });
+})();
+</script>
+</body>
+</html>

@@ -134,10 +134,11 @@ the page demonstrates the feature instead of describing it.
 - [ ] **The board** — a `<ul>` in `#support`, one `<li>` per person who helped (tester,
       bug report, idea, translation), newest first, with a template in an HTML comment.
       Only add a name the person agreed to.
-- [ ] **`og:image`** — still `https://yourdomain.com/share.jpg`.
-- [ ] **Screenshots** — they are genuine captures, so they show the real device numbers,
-      real Malaysian headlines and the real "312 events" holiday feed of the machine they
-      were taken on. Re-shoot them on a clean account before publishing.
+- [x] **`og:image`** — `assets/share.jpg`, 1200×630, rendered from the demo panel; the
+      absolute URL and the canonical link point at the published GitHub Pages address.
+- [x] **Screenshots** — shot from a seeded demo instance (`tools/site-demo/seed.py`), so
+      they show invented events, a neutral hostname and a public holiday feed. No real
+      device, calendar or name anywhere; see "Re-shooting" above before replacing them.
 - [ ] **Privacy copy** — the page says usage counts are off by default and lists what is
       in the summary. `docs/privacy.md` in the repo is the authority; a change to either
       means changing both, or the site becomes a promise the app breaks.
